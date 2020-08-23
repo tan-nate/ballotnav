@@ -13,3 +13,6 @@ Voters in the upcoming presidential election are caught between a rock and a har
 - Join the team on Slack #ballotnav.
 
 
+# Read more about our prject. 
+- [BallotNav one sheet](https://docs.google.com/document/d/15tMTwUnPnfAeN1C4KP4mvGWaiz3IfkktTY4drKFa8eo/edit)
+- [What does getting your ballot counted have to do with the Social Safety Net?](https://docs.google.com/document/d/1gWtxL74G2pGphoUKAnbul4UR93GfItuPzJKJC8_3up0/edit)
