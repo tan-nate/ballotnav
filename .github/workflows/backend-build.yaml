@@ -20,7 +20,7 @@ jobs:
       - name: Prepare docker tag
         id: prepare
         run: |
-          SHA=${{ github.event.pull_request.head.sha }}
+          SHA=${{ github.sha }}
           echo ::set-output name=sha::${SHA}
 
       - name: Login to DockerHub
