@@ -21,7 +21,7 @@ jobs:
         id: prepare
         run: |
           SHA=${{ github.sha }}
-          echo ::set-output name=sha::${SHA}
+          echo ::set-output name=sha::${SHA:0:8}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
