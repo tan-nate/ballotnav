@@ -18,7 +18,7 @@ services:
     command: npx nodemon -w /ballotnav/app.js -w /ballotnav/models -w /ballotnav/seeders -L app.js
 
   db:
-    image: postgres:11
+    image: jred/postgres:11-postgis
     restart: always
     environment:
       POSTGRES_USER: ballotnav
