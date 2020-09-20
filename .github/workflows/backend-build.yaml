@@ -16,6 +16,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+      - name: Prepare docker tag
+        id: prepare
+        run: |
+          SHA=${{ github.event.pull_request.head.sha }}
+        echo ::set-output name=sha::${SHA}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -30,9 +35,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           repository: ballotnav/ballotnav
-          tag_with_ref: true
-          tag_with_sha: true
-          add_git_labels: true
-          labels: description="Food Oasis LA",maintained="foodoasis+hub@hackforla.org"
+          push: true
+          tags: ${{ steps.prepare.outputs.sha }}
       - name: built image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
