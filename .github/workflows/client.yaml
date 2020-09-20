@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - master
-      - ci
+      # - ci
   #  paths:
   #    - "client/web/**"
 
