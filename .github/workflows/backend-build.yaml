@@ -35,8 +35,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          repository: ballotnav/ballotnav
           push: true
-          tags: ${{ steps.prepare.outputs.sha }}
+          tags: ballotnav/ballotnav:${{ steps.prepare.outputs.sha }}
       - name: built image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
