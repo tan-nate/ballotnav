@@ -101,10 +101,18 @@ exports.updateWip = async (req, res) => {
     editorUserId: editorUserId,
   })
   try {
+    let wipLocation = await req.db.WipLocation.findByPk(wipLocationId)
+    if (!wipLocation) {
+      // cannot update that which does not exist
+      return handleError(
+        {statusMessage: 'invalid or missing location'},
+        400,
+        res
+      )
+    }
     let results = await req.db.WipLocation.update(
       {
         ...req.body,
-        editorUserId: editorUserId,
         wipJurisdictionId: wipJurisdictionId,
       },
       { where: { id: wipLocationId } }
