@@ -1,12 +1,24 @@
-import React from 'react';
-import ResultHeader from './ResultHeader';
+import React, { useState } from 'react';
+import ResultHeader from '../info/ResultHeader';
 import Map from './Map';
+import CountyInfo from '../info/CountyInfo';
 
 const MapContainer = () => {
+  const [countyInfoOpen, setCountyInfoOpen] = useState(false);
+
+  const closeCountyInfo = () => {
+    setCountyInfoOpen(false);
+  };
+
+  const toggleCountyInfo = () => {
+    setCountyInfoOpen(!countyInfoOpen);
+  };
+
   return (
     <>
-      <ResultHeader />
-      <Map />
+      <ResultHeader toggleCountyInfo={toggleCountyInfo} />
+      <Map toggleCountyInfo={toggleCountyInfo} />
+      <CountyInfo open={countyInfoOpen} close={closeCountyInfo} />
     </>
   );
 }
