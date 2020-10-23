@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
 import ResultList from '../info/ResultList';
+import ResultsLayer from './ResultsLayer';
 
 const closeAlert = () => {
   const alert = document.getElementById('alert');
@@ -19,6 +20,13 @@ const closeAlert = () => {
 }
 
 class Map extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.map = null;
+    this.resultsLayer = null;
+  }
+
   componentDidMount() {
     const {
       search,
@@ -29,11 +37,16 @@ class Map extends React.Component {
 
     const center = (search ? search.center : [-87.6244, 41.8756]);
 
-    const map = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: this.mapContainer,
       style: 'mapbox://styles/mapbox/streets-v11',
       center: center,
       zoom: 13,
+    });
+
+    this.map.on('load', () => {
+      this.initLayers(true);
+      this.map.on('click', this.onClick);
     });
 
     const geocoder = new MapboxGeocoder({
@@ -44,31 +57,42 @@ class Map extends React.Component {
       types: 'address, neighborhood, locality, place, district, postcode'
     });
 
-    document.getElementById('map-geocoder').appendChild(geocoder.onAdd(map));
+    document.getElementById('map-geocoder').appendChild(geocoder.onAdd(this.map));
 
     geocoder.on('result', ({ result }) => {
       addSearch(result);
     });
+  }
 
-    // map.on('click', e => {
-    //   const features = map.queryRenderedFeatures(e.point, {
-    //     layers: ['chicago-parks'] // replace this with the name of the layer
-    //   });
+  initLayers = () => {
+    this.resultsLayer.init({
+      map: this.map,
+    });
+  }
 
-    //   if (!features.length) {
-    //     return;
-    //   }
+  onClick = e => {
+    const {
+      toggleResultDetail,
+    } = this.props;
 
-    //   const feature = features[0];
+    const features = this.map.queryRenderedFeatures(e.point, {
+      layers: ['result-circles'],
+    })
 
-    //   new mapboxgl.Popup({ offset: [0, -15] })
-    //     .setLngLat(feature.geometry.coordinates)
-    //     .setHTML('<h3>' + feature.properties.title + '</h3><p>' + feature.properties.description + '</p>')
-    //     .addTo(map);
-    // });
+    for (let i = 0; i < features.length; i++) {
+      const feature = features[i];
+
+      if (feature.layer.id === 'result-circles') {
+        toggleResultDetail();
+      }
+    }
   }
 
   render() {
+    const {
+      chicagoParks,
+    } = this.props;
+
     return (
       <div className="map">
         <div id='alert'>
@@ -81,8 +105,12 @@ class Map extends React.Component {
         </div>
         <ResultList toggleCountyInfo={this.props.toggleCountyInfo} />
         <div id="map-container" ref={el => this.mapContainer = el}>
-          <div id="map-geocoder" />
+          <ResultsLayer
+            results={chicagoParks}
+            ref={el => this.resultsLayer = el}
+          />
         </div>
+        <div id="map-geocoder" />
       </div>
     );
   }
@@ -90,6 +118,7 @@ class Map extends React.Component {
 
 const mapStateToProps = state => ({
   search: state.searches[state.searches.length - 1],
+  chicagoParks: state.chicagoParks,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -101,4 +130,5 @@ export default connect(mapStateToProps, mapDispatchToProps)(Map);
 Map.propTypes = {
   search: PropTypes.object,
   addSearch: PropTypes.func.isRequired,
+  chicagoParks: PropTypes.object,
 };

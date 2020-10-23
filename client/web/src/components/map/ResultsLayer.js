@@ -22,30 +22,26 @@ class ResultsLayer extends React.Component {
     const { results } = this.props;
     this.map.addSource('results', {
       type: 'geojson',
-      data: results
+      data: results,
     });
   };
 
   addLayers = () => {
-    const {
-    } = this.props;
-
     this.map.addLayer({
-      id: 'request-circles',
+      id: 'result-circles',
       type: 'circle',
-      source: 'requests',
+      source: 'results',
       paint: {
         'circle-radius': {
-          'base': 1.75,
+          'base': 0.5,
           'stops': [
             [10, 2],
             [15, 10]
           ],
         },
         'circle-color': '#FF0029',
-        'circle-opacity': 0.8,
+        'circle-opacity': 1,
       },
-      filter: typeFilter(selectedTypes),
     }, BEFORE_ID);
   };
 
@@ -64,6 +60,6 @@ ResultsLayer.propTypes = {
   results: PropTypes.shape({}),
 };
 
-RequestsLayer.defaultProps = {
+ResultsLayer.defaultProps = {
   results: {},
 };
