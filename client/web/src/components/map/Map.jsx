@@ -54,10 +54,8 @@ class Map extends React.Component {
       clearOnBlur: true,
     })
 
-    document
-      .getElementById('map-geocoder')
-      .appendChild(geocoder.onAdd(this.map))
-
+    document.getElementById('map-geocoder').appendChild(geocoder.onAdd(this.map));
+    geocoder.setPlaceholder('Enter an address or ZIP');
     geocoder.on('result', ({ result }) => {
       geocoder.clear()
       this.handleGeocodeResult({ result })

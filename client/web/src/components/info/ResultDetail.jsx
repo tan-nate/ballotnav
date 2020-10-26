@@ -2,19 +2,50 @@ import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock } from '@fortawesome/free-solid-svg-icons'
-import { Drawer, Dropdown } from 'rsuite'
-import Moment from 'react-moment'
+import { Drawer, Dropdown } from 'rsuite';
+import Moment from 'react-moment';
+import { useMediaQuery } from 'react-responsive';
 
 import pinIcon from '../../assets/pin-icon.svg'
 import backArrow from '../../assets/back-arrow-icon.svg'
 import infoIcon from '../../assets/info-icon-red.svg'
 import phoneIcon from '../../assets/phone-icon.svg'
 
-const ResultDetail = ({ location, data, open, close }) => {
-  if (!location) return null
+const ResultDetail = ({
+  location,
+  data,
+  open,
+  close,
+}) => {
+  const isDesktopOrLaptop = useMediaQuery({
+    query: '(min-width: 1224px)'
+  });
+  
+  if (!location) return null;
+
+  let size;
+  let placement;
+
+  if (isDesktopOrLaptop) {
+    size = "xs";
+  } else {
+    size = "md";
+  }
+
+  if (isDesktopOrLaptop) {
+    placement = "left";
+  } else {
+    placement = "bottom";
+  }
 
   const renderHours = () => {
-    if (location.scheduleType !== 'hours') return null
+    if (location.hours.length === 0) {
+      return (
+        <Dropdown.Item>
+          Not available yet
+        </Dropdown.Item>
+      );
+    }
 
     return location.hours.map((hour, index) => {
       const beginDate = new Date(hour.beginDate)
@@ -40,38 +71,36 @@ const ResultDetail = ({ location, data, open, close }) => {
     })
   }
 
-  const renderLinks = () =>
-    data.jurisdictionData.urls.map((url) => {
+  const renderLinks = () => {
+    if (data.jurisdictionData.urls.length === 0) {
+      return (
+        <p className="gray">Not available yet</p>
+      );
+    }
+    
+    data.jurisdictionData.urls.map(url => {
       if (url.isEmail) {
         return (
           <div key={url.id} className="links">
-            <p className="email">Email address: </p>
-            <a
-              href={'mailto:' + url.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {url.url}
-            </a>
+            <p className="email">Email address: </p><a href={"mailto:" + url.url} target="_blank" rel="noopener noreferrer">{url.url}</a>
           </div>
-        )
+        );
       } else {
         return (
           <div key={url.id} className="links">
-            <a href={url.url} target="_blank" rel="noopener noreferrer">
-              {url.name}
-            </a>
+            <a href={url.url} target="_blank" rel="noopener noreferrer">{url.name}</a>
           </div>
-        )
+        );
       }
-    })
+    });
+  }
 
   return (
     <Drawer
       show={open}
       onHide={close}
-      placement="bottom"
-      size="md"
+      placement={placement}
+      size={size}
       className="result-detail-drawer"
     >
       <Drawer.Header>
@@ -90,12 +119,11 @@ const ResultDetail = ({ location, data, open, close }) => {
         <h1>{location.name}</h1>
         <div className="result-card-content-wrapper">
           <img className="address-icon" src={pinIcon} alt="Address icon" />
-          <h4>
-            {location.address1.substring(0, location.address1.length - 1)},{' '}
-            {location.address2}
-          </h4>
+          <h4>{location.address1.substring(0, location.address1.length - 1)}</h4>&nbsp;
+          <h4>{location.address2}</h4>&nbsp;
+          <h4>{location.address3}</h4>&nbsp;
           <br />
-          <h4 className="second-line">{location.address3}</h4>
+          <h4 className="second-line">{location.city}, {location.state} {location.zip}</h4>
         </div>
         <div className="hours-dropdown">
           <span className="icon is-small">
@@ -116,7 +144,10 @@ const ResultDetail = ({ location, data, open, close }) => {
         <div className="to-verify">
           <p id="important">Call location to verify</p>
           <img className="phone-icon" src={phoneIcon} alt="Phone icon" />
-          <p>{location.contactPhone}</p>
+          {location.contactPhone
+            ? <p>{location.contactPhone}</p>
+            : <p className="gray">Not available yet</p>
+          }
         </div>
       </Drawer.Footer>
     </Drawer>
