@@ -27,7 +27,7 @@ class Map extends React.Component {
 
     this.map = null
     this.resultsLayer = null
-    this.state = { resultListOpen: true };
+    this.state = { resultListOpen: true }
   }
 
   componentDidMount() {
@@ -55,8 +55,10 @@ class Map extends React.Component {
       clearOnBlur: true,
     })
 
-    document.getElementById('map-geocoder').appendChild(geocoder.onAdd(this.map));
-    geocoder.setPlaceholder('Enter an address or ZIP');
+    document
+      .getElementById('map-geocoder')
+      .appendChild(geocoder.onAdd(this.map))
+    geocoder.setPlaceholder('Enter an address or ZIP')
     geocoder.on('result', ({ result }) => {
       geocoder.clear()
       this.handleGeocodeResult({ result })
@@ -69,11 +71,11 @@ class Map extends React.Component {
   }
 
   toggleResultList = () => {
-    this.setState({ resultListOpen: !this.state.resultListOpen });
+    this.setState({ resultListOpen: !this.state.resultListOpen })
   }
 
   closeResultList = () => {
-    this.setState({ resultListOpen: false });
+    this.setState({ resultListOpen: false })
   }
 
   handleGeocodeResult = async ({ result }) => {
@@ -85,7 +87,7 @@ class Map extends React.Component {
       const { id: jid } = jurisdictions[0]
       const query = queryString.stringify({ jid, lon, lat })
       history.push(`/map?${query}`)
-      this.toggleResultList();
+      this.toggleResultList()
     } else {
       history.push('/error') // TODO: figure out what route to go to
     }
@@ -98,23 +100,17 @@ class Map extends React.Component {
   }
 
   onClick = (e) => {
-    const { toggleResultDetail } = this.props
+    const { onSelectLocation } = this.props
 
     const features = this.map.queryRenderedFeatures(e.point, {
       layers: ['result-circles'],
     })
 
-    for (let i = 0; i < features.length; i++) {
-      const feature = features[i]
-
-      if (feature.layer.id === 'result-circles') {
-        toggleResultDetail()
-      }
-    }
+    if (features[0]) onSelectLocation(features[0].properties.id)
   }
 
   render() {
-    const { chicagoParks } = this.props
+    const { locations } = this.props
 
     return (
       <div className="map">
@@ -129,10 +125,15 @@ class Map extends React.Component {
             </span>
           </button>
         </div>
-        <ResultList toggleCountyInfo={this.props.toggleCountyInfo} toggleDrawer={this.toggleResultList} close={this.closeResultList} open={this.state.resultListOpen} />
+        <ResultList
+          toggleCountyInfo={this.props.toggleCountyInfo}
+          toggleDrawer={this.toggleResultList}
+          close={this.closeResultList}
+          open={this.state.resultListOpen}
+        />
         <div id="map-container" ref={(el) => (this.mapContainer = el)}>
           <ResultsLayer
-            results={chicagoParks}
+            results={locations}
             ref={(el) => (this.resultsLayer = el)}
           />
         </div>
@@ -142,9 +143,23 @@ class Map extends React.Component {
   }
 }
 
+function locationsToGeoJson(locations) {
+  return {
+    type: 'FeatureCollection',
+    features: locations.map((loc) => ({
+      type: 'Feature',
+      properties: loc,
+      geometry: {
+        type: 'Point',
+        coordinates: [loc.geomLongitude, loc.geomLatitude],
+      },
+    })),
+  }
+}
+
 const mapStateToProps = (state) => ({
   search: state.searches[state.searches.length - 1],
-  chicagoParks: state.chicagoParks,
+  locations: locationsToGeoJson(state.data.jurisdictionData.locations),
 })
 
 const mapDispatchToProps = (dispatch) => ({
