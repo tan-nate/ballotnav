@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 import clx from 'classnames'
+import { Link } from 'react-router-dom'
 
 import logo from '../../assets/ballotnav-logo.png'
+
+import Footer from 'components/main/Footer'
 
 const Header = ({ location: { pathname } }) => {
   const [activeBurger, setActiveBurger] = useState(false)
@@ -26,7 +28,11 @@ const Header = ({ location: { pathname } }) => {
       aria-label="main navigation"
       className={clx('navbar', { map: ['/map'].includes(pathname) })}
     >
-      <div className="navbar-brand">
+      <div
+        className={clx('backgroundBlur', { 'is-active': activeBurger })}
+        onClick={handleClick}
+      ></div>
+      <div className={clx('navbar-brand', { 'is-active': activeBurger })}>
         <Link to="/" className="navbar-item">
           <img src={logo} alt="BallotNav logo"></img>
         </Link>
@@ -46,16 +52,31 @@ const Header = ({ location: { pathname } }) => {
       </div>
 
       <div className={clx('navbar-menu', { 'is-active': activeBurger })}>
+        <div className="hamburger-menu">
+          <div className="hamburger-menu-content">
+            <img src={logo} alt="" />
+            <a className="navbar-item" href="/about">
+              About
+            </a>
+            <a className="navbar-item" href="/volunteer">
+              Volunteer
+            </a>
+            <a className="navbar-item" href="/press">
+              Press
+            </a>
+          </div>
+          <Footer />
+        </div>
         <div className="navbar-end">
-          <a className="navbar-item" href="/about">
+          <Link className="navbar-item" to="/about">
             About
-          </a>
-          <a className="navbar-item" href="/volunteer">
+          </Link>
+          <Link className="navbar-item" to="/volunteer">
             Volunteer
-          </a>
-          <a className="navbar-item" href="/press">
+          </Link>
+          <Link className="navbar-item" to="/press">
             Press
-          </a>
+          </Link>
         </div>
       </div>
     </nav>
